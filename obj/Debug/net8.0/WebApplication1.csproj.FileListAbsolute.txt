@@ -137,3 +137,4 @@ I:\c#\v2\WebApplication1\WebApplication1\bin\Debug\net8.0\runtimes\win\lib\net6.
 I:\c#\v2\WebApplication1\WebApplication1\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 I:\c#\v2\WebApplication1\WebApplication1\bin\Debug\net8.0\MySqlConnector.dll
 I:\c#\v2\WebApplication1\WebApplication1\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
+I:\c#\v2\WebApplication1\WebApplication1\obj\Debug\net8.0\WebApplication1.sourcelink.json
