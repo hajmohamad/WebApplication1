@@ -12,14 +12,36 @@ namespace WebApplication1.Controller;
 public class AcountController : ControllerBase
 { 
     public readonly UserManager<AppUser> _userManager;
+    public readonly SignInManager<AppUser> _signInManager;
 
     public readonly ITokenService tokenService;
 
-public AcountController(UserManager<AppUser> userManager, ITokenService tokenService){
+public AcountController(UserManager<AppUser> userManager, ITokenService tokenService,SignInManager<AppUser> signInManager){
 
     this.tokenService = tokenService;
     _userManager = userManager;
+    _signInManager = signInManager;
 
+
+}
+
+//login
+
+[HttpPost("login")]
+public async Task<IActionResult> Login([FromBody] LoginDto request){
+    var user = await _userManager.FindByNameAsync(request.UserName.ToLower());
+    if(user == null){
+        return Unauthorized("User not found");
+    }
+    var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+    if(!result.Succeeded){
+        return Unauthorized("username or password is incorrect");
+    }
+    return Ok(new NewUserDto{
+        UserName = user.UserName,
+        Email = user.Email,
+        Token = tokenService.CreateToken(user)
+    });
 }
 
 
@@ -30,10 +52,10 @@ public async Task<IActionResult> Register([FromBody] RegisterDto request){
     
 try
 {
-    if(!TryValidateModel(request)){
-            return BadRequest(ModelState);
-
-        }
+    if(!ModelState.IsValid){
+        return BadRequest(ModelState);
+        
+    }
     var appUser = new AppUser{
         UserName = request.UserName,
         Email = request.Email,
@@ -76,4 +98,5 @@ catch (Exception  e)
         throw new NotImplementedException();
     }
 
+   
 }
