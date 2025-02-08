@@ -2,6 +2,8 @@ using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Dtos;
+using WebApplication1.Dtos.Acount;
+using WebApplication1.Interface;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controller;
@@ -10,9 +12,12 @@ namespace WebApplication1.Controller;
 public class AcountController : ControllerBase
 { 
     public readonly UserManager<AppUser> _userManager;
-public AcountController(UserManager<AppUser> userManager){
 
+    public readonly ITokenService tokenService;
 
+public AcountController(UserManager<AppUser> userManager, ITokenService tokenService){
+
+    this.tokenService = tokenService;
     _userManager = userManager;
 
 }
@@ -21,27 +26,31 @@ public AcountController(UserManager<AppUser> userManager){
 //register 
 
 [HttpPost("register")]
-public async Task<IActionResult> Register([FromBody] CreateUserRequest request){
+public async Task<IActionResult> Register([FromBody] RegisterDto request){
     
 try
 {
+    if(!TryValidateModel(request)){
+            return BadRequest(ModelState);
 
+        }
     var appUser = new AppUser{
         UserName = request.UserName,
         Email = request.Email,
         
     };  
     
-    if(!TryValidateModel(appUser)){
-        return BadRequest(ModelState);
-
-    }
+    
     var creatUser = await _userManager.CreateAsync(appUser, request.Password);
     if(creatUser.Succeeded)
     {
         var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
         if(roleResult.Succeeded){
-                return Ok("User Created");   
+                return Ok(new NewUserDto{
+                    UserName = appUser.UserName,
+                    Email = appUser.Email,
+                    Token = tokenService.CreateToken(appUser)
+                });   
 
         }else {
             return statusCode(500,roleResult.Errors);

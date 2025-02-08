@@ -4,7 +4,9 @@ using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WebApplication1.Data;
+using WebApplication1.Interface;
 using WebApplication1.Models;
+using WebApplication1.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +55,8 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>{
 
         };
     });
+    builder.Services.AddScoped<ITokenService, TokenService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
